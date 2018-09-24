@@ -15,3 +15,4 @@ use Illuminate\Http\Request;
 
 Route::resource('users', 'UserController');
 Route::resource('autos','AutoController');
+Route::resource('estacionamiento', 'EstacionamientoController');
