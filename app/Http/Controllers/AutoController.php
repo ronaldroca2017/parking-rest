@@ -51,7 +51,7 @@ class AutoController extends Controller
             $auto ->save();
             $status="ok";
             $data=$auto;
-        } catch (/Exception $e){}
+        } catch (\Exception $e){}
 
       
         return response()->json([
@@ -104,5 +104,6 @@ class AutoController extends Controller
     public function destroy($id)
     {
         //
+
     }
 }
