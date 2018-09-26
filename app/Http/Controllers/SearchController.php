@@ -8,7 +8,12 @@ use App\Estacionamiento;
 class SearchController extends Controller
 {
     public function index (Request $request) {
-        dd($request->all());
+        dd(
+            ( $request->get('lati') + $request->get('dla') ),
+            ( $request->get('lati') - $request->get('dla') ),
+            ( $request->get('longi') + $request->get('dlo') ),
+            ( $request->get('longi') - $request->get('dlo') )
+        );
         $search = Estacionamiento::where('latitud', '<', ( $request->get('lati') + $request->get('dla') ))
                     ->where('latitud', '<', ( $request->get('lati') - $request->get('dla') ))
                     ->where('latitud', '<', ( $request->get('longi') + $request->get('dlo') ))
