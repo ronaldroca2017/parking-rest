@@ -11,6 +11,7 @@ use DB;
 use Carbon\Carbon;
 use Response;
 use Illuminate\Support\Collection;
+ 
 
 class EstacionamientoController extends Controller
 {
@@ -22,10 +23,10 @@ class EstacionamientoController extends Controller
     public function index( Request $request)
     { 
 
-		$status='error';
-		$dataEstacionamiento = null;
-		$dataEstacionamientoHorario = null;
-		$estacionamiento_horario = null;
+        $status='error';
+        $dataEstacionamiento = null;
+        $dataEstacionamientoHorario = null;
+        $estacionamiento_horario = null;
         $id=$request->get('id');
 
         
@@ -33,12 +34,12 @@ class EstacionamientoController extends Controller
 
       
         if(!empty($estacionamiento)){
-            $status='ok';
+            $status='ok';    
             $dataEstacionamiento = $estacionamiento;
-            $estacionamiento_horario=EstacionamientoHorario::select('*')->where('id_estacionamiento',$estacionamiento->id_estacionamiento)->get();
+            $estacionamiento_horario=EstacionamientoHorario::select('*')->where('id_estacionamiento',$estacionamiento->id)->get();
 
         }if(!empty($estacionamiento_horario)){
-        	$dataEstacionamientoHorario = $estacionamiento_horario;
+            $dataEstacionamientoHorario = $estacionamiento_horario;
         }
         return response()->json([
             'status' => 'ok',
@@ -65,48 +66,54 @@ class EstacionamientoController extends Controller
      */
     public function store(Request $request)
     {
-		$status = 'error';
-		$data = null;
+        $status = 'error';
+        $data = null;
 
-    try{
-     
+    try{  
+        
         DB::beginTransaction();
-
-        $estacionamiento = new Estacionamiento;
-        //$estacionamiento->id_estacionamiento=$request->get('idEstacionamiento');
+ 
+        $id=$request->get('idEstacionamiento'); 
+        if(! empty($id)){ 
+            $estacionamiento = Estacionamiento::find($id);
+        }else{ 
+            $estacionamiento = new Estacionamiento; 
+        } 
         $estacionamiento->id_tipo_propiedad=$request->get('txt_idTipopropiedad');
         $estacionamiento->id_tipo_estacionamiento=$request->get('txt_idTipoEstacionamiento');
         $estacionamiento->nombre=$request->get('nombre');
-        $estacionamiento->direccion=$request->get('direccion');
+        $estacionamiento->direccion=$request->get('direccion');    
         $estacionamiento->latitud=$request->get('latitud');
-        $estacionamiento->longitud=$request->get('longitud');
-        $estacionamiento->estado='1';
-        $estacionamiento->id_usuario = '1';
-        $estacionamiento->save();
- 
- 
+        $estacionamiento->longitud=$request->get('longitud');  
+        $estacionamiento->estado='1';  
+        $estacionamiento->id_usuario = $request->get('idUsuario');
+        $estacionamiento->save(); 
 
-        //$fechacActual = Carbon::now('America/Lima');
+
+        //$fechaSeleccionada = Carbon::now('America/Lima');
         $dia=$request->get('dia');
         $fechaSeleccionada=$request->get('fechaSeleccionada'); 
         $hora_ingreso=$request->get('h_ingreso');
         $hora_salida=$request->get('h_salida');
         $tarifa=$request->get('tarifa');
-        //$accion=$request->get('accion');
-        $id_usuario=1;  
-        
+        $idEstacionamientoHorario=$request->get('id_estacionamiento_horario');
 
-          
-        $count = 0; 
+        
+            
+        $count = 0;   
  
         while ($count < count($dia)){
-     
-        $estacionamientoHorario = new EstacionamientoHorario();
+
+        if($idEstacionamientoHorario[$count]!=""){  
+            $estacionamientoHorario = EstacionamientoHorario::find($idEstacionamientoHorario[$count]);
+        }else{ 
+             $estacionamientoHorario = new EstacionamientoHorario();
+        } 
         $estacionamientoHorario->id_estacionamiento= $estacionamiento->id;
         $estacionamientoHorario->dia=$dia[$count];
         $estacionamientoHorario->fecha_calendario=$fechaSeleccionada[$count];
         $estacionamientoHorario->hora_ingreso=$hora_ingreso[$count];
-        $estacionamientoHorario->hora_salida=$hora_salida[$count]; 
+        $estacionamientoHorario->hora_salida=$hora_salida[$count];  
         $estacionamientoHorario->tarifa=$tarifa[$count];
         $estacionamientoHorario->reservado=0;  
         $estacionamientoHorario->save();
@@ -115,36 +122,27 @@ class EstacionamientoController extends Controller
         } 
 
     
-		$status = 'ok';
-		$data = $estacionamiento;
+        $status = 'ok';
+        $data = $estacionamiento;
         DB::commit();
 
 
-        }catch(\Exception $e){
+        }catch(\Exception $e){ 
              DB::rollback();
-             dd('jejejjeje : '.$e);
-             return "ERROR AL RESGISTRAR";
+             dd('ERROR BASE DATOS  : '.$e);
+             return "ERROR AL REGISTRAR";
         }
 
-        /*
-      
-       $estacionamientoHorario2 = new EstacionamientoHorario();
-        foreach ($estacionamientoHorarioArray as $key => $value) {
-            if (is_array($value)) {
-                $value = convertToObject($value);
-            }
-            $estacionamientoHorario2 = $value;
-
-              $estacionamientoHorario2->save();
-        }*/
-      
+     
         //return Redirect::to('estacionamiento.create'); 
         return response()->json([
-				'status' => $status,
-				'data' => $data
-				]);
+                'status' => $status,
+                'data' => $data
+                ]);
 
-    }  
+        }  
+
+     
 
 
  public function arreglo(Request $request)
@@ -162,7 +160,6 @@ class EstacionamientoController extends Controller
         $estacionamientoHorario->hora_salida='16:00';
         $estacionamientoHorario->tarifa=20.00;
         $estacionamientoHorario->id_usuario=1;  
-      
 
         $estacionamientoHorarioArray = array($estacionamientoHorario);
 
