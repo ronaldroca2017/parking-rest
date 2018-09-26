@@ -19,15 +19,31 @@ class EstacionamientoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( Request $request)
     { 
-        $estacionamiento =  Estacionamiento::all()->toArray();
-       
-        dd($estacionamiento);
-    
+
+		$status='error';
+		$dataEstacionamiento = null;
+		$dataEstacionamientoHorario = null;
+		$estacionamiento_horario = null;
+        $id=$request->get('id');
+
+        
+        $estacionamiento=Estacionamiento::select('*')->where('id_usuario',(int)$id)->first();
+
+      
+        if(!empty($estacionamiento)){
+            $status='ok';
+            $dataEstacionamiento = $estacionamiento;
+            $estacionamiento_horario=EstacionamientoHorario::select('*')->where('id_estacionamiento',$estacionamiento->id_estacionamiento)->get();
+
+        }if(!empty($estacionamiento_horario)){
+        	$dataEstacionamientoHorario = $estacionamiento_horario;
+        }
         return response()->json([
             'status' => 'ok',
-            'data' => $estacionamiento
+            'data' =>  $dataEstacionamiento,
+            'dataArray' => $dataEstacionamientoHorario
         ]);
     }
  
@@ -57,6 +73,7 @@ class EstacionamientoController extends Controller
         DB::beginTransaction();
 
         $estacionamiento = new Estacionamiento;
+        //$estacionamiento->id_estacionamiento=$request->get('idEstacionamiento');
         $estacionamiento->id_tipo_propiedad=$request->get('txt_idTipopropiedad');
         $estacionamiento->id_tipo_estacionamiento=$request->get('txt_idTipoEstacionamiento');
         $estacionamiento->nombre=$request->get('nombre');
@@ -75,6 +92,7 @@ class EstacionamientoController extends Controller
         $hora_ingreso=$request->get('h_ingreso');
         $hora_salida=$request->get('h_salida');
         $tarifa=$request->get('tarifa');
+        //$accion=$request->get('accion');
         $id_usuario=1;  
         
 
