@@ -15,9 +15,9 @@ class SearchController extends Controller
             ( $request->get('longi') - $request->get('dlo') )
         );
         $search = Estacionamiento::where('latitud', '<', ( $request->get('lati') + $request->get('dla') ))
-                    ->where('latitud', '<', ( $request->get('lati') - $request->get('dla') ))
+                    ->where('latitud', '>', ( $request->get('lati') - $request->get('dla') ))
                     ->where('latitud', '<', ( $request->get('longi') + $request->get('dlo') ))
-                    ->where('latitud', '<', ( $request->get('longi') - $request->get('dlo') ))
+                    ->where('latitud', '>', ( $request->get('longi') - $request->get('dlo') ))
                     ->get();
 
         return response()->json([
