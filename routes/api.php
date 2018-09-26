@@ -18,5 +18,6 @@ Route::resource('login', 'SesionController');
 Route::resource('estacionamiento', 'EstacionamientoController');
 Route::resource('autos','AutoController');
 Route::resource('obtenerusuario', 'GetUsuarioController');
+Route::resource('solicitud','SolicitudController');
 
 Route::post('search', 'SearchController@index');
