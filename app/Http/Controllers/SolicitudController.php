@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Solicitud;
 
 class SolicitudController extends Controller
 {
@@ -13,7 +14,7 @@ class SolicitudController extends Controller
      */
     public function index()
     {
-        return "Go go siii seee puede";
+        return Solicitud::all();
     }
 
     /**
@@ -23,7 +24,7 @@ class SolicitudController extends Controller
      */
     public function create()
     {
-        return view('createsolicitud');
+        //
     }
 
     /**
@@ -34,7 +35,26 @@ class SolicitudController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $status = 'error';
+        $data = null;
+
+        try{
+
+            $solicitud = new Solicitud();
+            $solicitud ->usuario = $request->get('usuario');
+            $solicitud ->placa = $request->get('placa');
+            $solicitud ->estacionamiento = $request->get('estacionamiento');
+            $solicitud ->horario = $request->get('horario');
+            $solicitud ->save();
+            $status="ok";
+            $data=$solicitud;
+        } catch (\Exception $e){}
+
+      
+        return response()->json([
+            'status' => $status,
+            'data' => $data
+        ]);
     }
 
     /**
@@ -45,7 +65,7 @@ class SolicitudController extends Controller
      */
     public function show($id)
     {
-        //
+        return Solicitud::find($id);
     }
 
     /**
