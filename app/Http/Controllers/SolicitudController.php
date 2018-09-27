@@ -67,6 +67,8 @@ class SolicitudController extends Controller
             $solicitud->save();
             $status="ok";
             $data=$solicitud;
+
+            $this->ironmq->postMessage($this->queue_name, "Solicitud Registrada Nro ". $solicitud->id ." del usuario: ". $request->get('usuario'));
         } catch (\Exception $e){}
 
         return response()->json([
