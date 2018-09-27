@@ -4,9 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Solicitud;
+use App\Auto;
+use App\Estacionamiento;
+use App\EstacionamientoHorario;
 
 class SolicitudController extends Controller
 {
+    private $ironmq;
+    private $queue_name;
+
+    function __construct () {
+        $this->ironmq = new IronMQ([
+            "token" => env('IRON_TOKEN'),
+            "project_id" => env('IRON_PROJECT_ID'),
+        ]);
+
+        $this->queue_name = env('IRON_QUEUE_NAME');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,18 +54,19 @@ class SolicitudController extends Controller
         $data = null;
 
         try{
+            $carro = Auto::where('usuario', $request->get('usuario'))->first();
+            $estacionamientoHorario = EstacionamientoHorario::where('id_estacionamiento', $request->get('estacionamiento'))->first();
 
             $solicitud = new Solicitud();
-            $solicitud ->usuario = $request->get('usuario');
-            $solicitud ->placa = $request->get('placa');
-            $solicitud ->estacionamiento = $request->get('estacionamiento');
-            $solicitud ->horario = $request->get('horario');
-            $solicitud ->save();
+            $solicitud->usuario = $request->get('usuario');
+            $solicitud->placa = (!empty($carro)) ? $carro->placa : 'pendiente';
+            $solicitud->estacionamiento = $request->get('estacionamiento');
+            $solicitud->horario = $estacionamientoHorario->id;
+            $solicitud->save();
             $status="ok";
             $data=$solicitud;
         } catch (\Exception $e){}
 
-      
         return response()->json([
             'status' => $status,
             'data' => $data
