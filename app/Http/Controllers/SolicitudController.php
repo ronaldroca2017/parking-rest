@@ -8,6 +8,8 @@ use App\Auto;
 use App\Estacionamiento;
 use App\EstacionamientoHorario;
 
+use IronMQ\IronMQ;
+
 class SolicitudController extends Controller
 {
     private $ironmq;
